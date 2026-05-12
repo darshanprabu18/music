@@ -1,73 +1,130 @@
-import { useEffect, useState } from "react";
-import api from "../api/client.js";
+import { useState } from "react";
+import { motion } from "framer-motion";
+
 import PageTransition from "../components/PageTransition.jsx";
-import SongCard from "../components/SongCard.jsx";
-import { useToast } from "../context/ToastContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
-  const [username, setUsername] = useState("");
-  const [image, setImage] = useState(null);
-  const { toast } = useToast();
+  const { user, logout } = useAuth();
 
-  const load = async () => {
-    const { data } = await api.get("/users/profile");
-    setProfile(data);
-    setUsername(data.user.username);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const update = async (event) => {
-    event.preventDefault();
-    const body = new FormData();
-    body.append("username", username);
-    if (image) body.append("profileImage", image);
-    await api.patch("/users/profile", body, { headers: { "Content-Type": "multipart/form-data" } });
-    toast("Profile updated");
-    load();
-  };
-
-  if (!profile) return <PageTransition><div className="glass rounded-[1.5rem] p-6">Loading profile...</div></PageTransition>;
+  const [name, setName] = useState(user?.username || "");
 
   return (
     <PageTransition>
-      <section className="glass grid gap-6 rounded-[2rem] p-6 md:grid-cols-[auto_1fr]">
-        <div className="h-32 w-32 overflow-hidden rounded-[2rem] bg-gradient-to-br from-lagoon to-flare">
-          {profile.user.profileImage && <img src={profile.user.profileImage} alt="" className="h-full w-full object-cover" />}
-        </div>
-        <div>
-          <h1 className="text-4xl font-black">{profile.user.username}</h1>
-          <p className="mt-2 text-white/55">{profile.user.email}</p>
-          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-            <Stat label="Uploads" value={profile.uploadedSongs.length} />
-            <Stat label="Playlists" value={profile.playlists.length} />
-            <Stat label="Favorites" value={profile.user.favorites.length} />
-          </div>
-        </div>
-      </section>
-      <form onSubmit={update} className="glass mt-6 grid gap-4 rounded-[1.5rem] p-5 md:grid-cols-[1fr_1fr_auto]">
-        <input value={username} onChange={(e) => setUsername(e.target.value)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 outline-none" />
-        <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3" />
-        <button className="rounded-2xl bg-white px-5 py-3 font-black text-ink">Save</button>
-      </form>
-      <section className="mt-8">
-        <h2 className="mb-4 text-2xl font-black">Uploaded songs</h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {profile.uploadedSongs.map((song) => <SongCard key={song._id} song={song} songs={profile.uploadedSongs} />)}
-        </div>
-      </section>
-    </PageTransition>
-  );
-}
+      <div className="pb-32">
+        
+        {/* TOP PROFILE CARD */}
 
-function Stat({ label, value }) {
-  return (
-    <div className="rounded-2xl bg-white/8 p-4">
-      <p className="text-2xl font-black">{value}</p>
-      <p className="text-xs font-bold text-white/45">{label}</p>
-    </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-cyan-500/20 via-violet-500/20 to-pink-500/20 p-6 shadow-2xl backdrop-blur-xl"
+        >
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-cyan-400/20 blur-3xl" />
+
+          <div className="relative z-10 flex flex-col items-center text-center">
+            
+            {/* PROFILE IMAGE */}
+
+            <div className="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 text-5xl font-black shadow-2xl">
+              {user?.username?.charAt(0)?.toUpperCase()}
+            </div>
+
+            <h1 className="mt-5 text-4xl font-black">
+              {user?.username}
+            </h1>
+
+            <p className="mt-2 text-white/60">
+              {user?.email}
+            </p>
+
+            {/* STATS */}
+
+            <div className="mt-8 grid w-full grid-cols-3 gap-3">
+              
+              <div className="rounded-3xl bg-white/5 p-4">
+                <p className="text-3xl font-black">
+                  {user?.uploads?.length || 0}
+                </p>
+
+                <p className="mt-1 text-xs text-white/45">
+                  Uploads
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-white/5 p-4">
+                <p className="text-3xl font-black">
+                  {user?.playlists?.length || 0}
+                </p>
+
+                <p className="mt-1 text-xs text-white/45">
+                  Playlists
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-white/5 p-4">
+                <p className="text-3xl font-black">
+                  {user?.favorites?.length || 0}
+                </p>
+
+                <p className="mt-1 text-xs text-white/45">
+                  Favorites
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ACCOUNT SETTINGS */}
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mt-6 rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl"
+        >
+          <h2 className="text-2xl font-black">
+            Account Settings
+          </h2>
+
+          <div className="mt-5">
+            <label className="mb-2 block text-sm font-semibold text-white/60">
+              Username
+            </label>
+
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none"
+            />
+          </div>
+
+          <div className="mt-4">
+            <label className="mb-2 block text-sm font-semibold text-white/60">
+              Email
+            </label>
+
+            <input
+              disabled
+              value={user?.email}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/50 outline-none"
+            />
+          </div>
+
+          <button className="mt-6 w-full rounded-2xl bg-white py-4 text-lg font-black text-black transition hover:scale-[1.02]">
+            Save Changes
+          </button>
+        </motion.div>
+
+        {/* LOGOUT */}
+
+        <button
+          onClick={logout}
+          className="mt-6 w-full rounded-2xl bg-red-500/20 py-4 text-lg font-black text-red-300 backdrop-blur-xl transition hover:bg-red-500/30"
+        >
+          Logout
+        </button>
+      </div>
+    </PageTransition>
   );
 }
