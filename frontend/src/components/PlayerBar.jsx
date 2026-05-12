@@ -29,22 +29,19 @@ export default function PlayerBar() {
     <motion.div
       initial={{ y: 120, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed inset-x-3 bottom-20 md:bottom-3 z-40 mx-auto max-w-7xl rounded-[1.7rem] border border-white/15 bg-ink/80 p-3 shadow-roseglow backdrop-blur-2xl"
+      className="fixed inset-x-3 bottom-20 md:bottom-3 z-40 mx-auto max-w-7xl rounded-[1.7rem] border border-white/15 bg-ink/80 p-4 shadow-roseglow backdrop-blur-2xl"
     >
       <div className="grid items-center gap-4 md:grid-cols-[1.2fr_1.6fr_1fr]">
-        <div className="flex min-w-0 items-center gap-3">
-          <img
-            src={current.coverImage}
-            alt=""
-            className="h-16 w-16 rounded-2xl object-cover"
-          />
+        
+        {/* Song Info */}
 
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">
+        <div className="flex min-w-0 items-center justify-center gap-4">
+          <div className="min-w-0 text-center">
+            <p className="truncate text-lg font-extrabold">
               {current.title}
             </p>
 
-            <p className="truncate text-xs text-white/50">
+            <p className="truncate text-sm text-white/50">
               {current.artist}
             </p>
           </div>
@@ -52,10 +49,12 @@ export default function PlayerBar() {
           <Waveform active={isPlaying} />
         </div>
 
+        {/* Controls */}
+
         <div>
-          <div className="mb-2 flex items-center justify-center gap-2">
+          <div className="mb-3 flex items-center justify-center gap-3">
             <button
-              className={`h-9 w-9 rounded-full ${
+              className={`h-10 w-10 rounded-full ${
                 shuffle
                   ? "bg-lagoon/25 text-lagoon"
                   : "bg-white/5"
@@ -66,28 +65,30 @@ export default function PlayerBar() {
             </button>
 
             <button
-              className="h-10 w-10 rounded-full bg-white/10"
+              className="h-11 w-11 rounded-full bg-white/10"
               onClick={playPrevious}
             >
               ◀
             </button>
 
             <button
-              className="h-12 w-12 rounded-full bg-white text-ink shadow-glow"
+              className="grid h-16 w-16 place-items-center rounded-full bg-white text-black shadow-glow"
               onClick={togglePlay}
             >
-              {isPlaying ? "II" : "▶"}
+              <span className="text-2xl">
+                {isPlaying ? "II" : "▶"}
+              </span>
             </button>
 
             <button
-              className="h-10 w-10 rounded-full bg-white/10"
+              className="h-11 w-11 rounded-full bg-white/10"
               onClick={playNext}
             >
               ▶
             </button>
 
             <button
-              className={`h-9 w-9 rounded-full ${
+              className={`h-10 w-10 rounded-full ${
                 repeat
                   ? "bg-flare/25 text-flare"
                   : "bg-white/5"
@@ -97,6 +98,8 @@ export default function PlayerBar() {
               ↻
             </button>
           </div>
+
+          {/* Progress */}
 
           <div className="flex items-center gap-3 text-[11px] font-semibold text-white/45">
             <span className="w-10 text-right">
@@ -108,7 +111,9 @@ export default function PlayerBar() {
               min="0"
               max={duration || 0}
               value={progress}
-              onChange={(event) => seek(Number(event.target.value))}
+              onChange={(event) =>
+                seek(Number(event.target.value))
+              }
               className="h-1 flex-1 accent-lagoon"
               aria-label="Seek"
             />
@@ -118,6 +123,8 @@ export default function PlayerBar() {
             </span>
           </div>
         </div>
+
+        {/* Desktop Volume */}
 
         <div className="hidden items-center justify-end gap-3 md:flex">
           <span className="text-xs text-white/45">
