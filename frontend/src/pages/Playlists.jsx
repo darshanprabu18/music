@@ -1,72 +1,152 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+
 import api from "../api/client.js";
 import PageTransition from "../components/PageTransition.jsx";
-import { useToast } from "../context/ToastContext.jsx";
 
-const colorOptions = [
-  "from-cyan-400 to-pink-500",
-  "from-blue-400 to-violet-500",
-  "from-fuchsia-400 to-rose-500",
-  "from-emerald-300 to-cyan-500"
+const gradients = [
+  "from-cyan-400 via-blue-500 to-pink-500",
+  "from-violet-500 via-fuchsia-500 to-pink-500",
+  "from-emerald-400 via-cyan-500 to-blue-500",
+  "from-orange-400 via-pink-500 to-red-500",
 ];
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "", coverColor: colorOptions[0] });
-  const { toast } = useToast();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-  const load = async () => {
+  const fetchPlaylists = async () => {
     const { data } = await api.get("/playlists");
     setPlaylists(data);
   };
 
   useEffect(() => {
-    load();
+    fetchPlaylists();
   }, []);
 
-  const create = async (event) => {
-    event.preventDefault();
-    try {
-      await api.post("/playlists", form);
-      setForm({ name: "", description: "", coverColor: colorOptions[0] });
-      toast("Playlist created");
-      load();
-    } catch (error) {
-      toast(error.response?.data?.message || "Could not create playlist", "error");
-    }
+  const createPlaylist = async (e) => {
+    e.preventDefault();
+
+    if (!title.trim()) return;
+
+    await api.post("/playlists", {
+      name: title,
+      description,
+    });
+
+    setTitle("");
+    setDescription("");
+
+    fetchPlaylists();
   };
 
   return (
     <PageTransition>
-      <h1 className="text-4xl font-black">Playlists</h1>
-      <form onSubmit={create} className="glass mt-6 grid gap-4 rounded-[1.6rem] p-5 md:grid-cols-[1fr_1fr_auto]">
-        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Playlist name" className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 outline-none" required />
-        <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 outline-none" />
-        <button className="rounded-2xl bg-white px-5 py-3 font-black text-ink">Create</button>
-      </form>
-      <div className="mt-6 flex flex-wrap gap-2">
-        {colorOptions.map((coverColor) => (
-          <button
-            key={coverColor}
-            type="button"
-            onClick={() => setForm({ ...form, coverColor })}
-            className={`h-10 w-16 rounded-2xl bg-gradient-to-br ${coverColor} ${form.coverColor === coverColor ? "ring-4 ring-white/40" : ""}`}
-            aria-label="Choose playlist color"
-          />
-        ))}
-      </div>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {playlists.map((playlist) => (
-          <Link key={playlist._id} to={`/playlists/${playlist._id}`} className="glass group rounded-[1.6rem] p-5 transition hover:-translate-y-1">
-            <div className={`h-36 rounded-[1.2rem] bg-gradient-to-br ${playlist.coverColor || colorOptions[0]} p-5`}>
-              <p className="text-4xl font-black">{playlist.songs?.length || 0}</p>
-              <p className="text-sm font-bold">tracks</p>
-            </div>
-            <h2 className="mt-4 text-xl font-black">{playlist.name}</h2>
-            <p className="mt-1 line-clamp-2 text-sm text-white/55">{playlist.description || "A custom cloud mix."}</p>
-          </Link>
-        ))}
+      <div className="pb-32">
+        
+        {/* TITLE */}
+
+        <div className="mb-6">
+          <p className="text-sm font-bold uppercase text-cyan-400">
+            Your Library
+          </p>
+
+          <h1 className="mt-2 text-5xl font-black">
+            Playlists
+          </h1>
+        </div>
+
+        {/* CREATE CARD */}
+
+        <motion.form
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          onSubmit={createPlaylist}
+          className="rounded-[2.3rem] border border-white/10 bg-white/5 p-5 backdrop-blur-2xl"
+        >
+          <div className="space-y-4">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Playlist name"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg outline-none"
+            />
+
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Description"
+              rows="3"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg outline-none"
+            />
+
+            <button className="w-full rounded-2xl bg-white py-4 text-lg font-black text-black transition hover:scale-[1.02]">
+              Create Playlist
+            </button>
+          </div>
+        </motion.form>
+
+        {/* PLAYLIST GRID */}
+
+        <div className="mt-7 space-y-5">
+          {playlists.map((playlist, index) => (
+            <Link
+              key={playlist._id}
+              to={`/playlists/${playlist._id}`}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="overflow-hidden rounded-[2.3rem] border border-white/10 bg-[#0c1020]/90 backdrop-blur-xl"
+              >
+                
+                {/* COVER */}
+
+                <div
+                  className={`h-44 bg-gradient-to-br ${
+                    gradients[index % gradients.length]
+                  } relative`}
+                >
+                  <div className="absolute left-6 top-6">
+                    <p className="text-6xl font-black text-white">
+                      {playlist.songs?.length || 0}
+                    </p>
+
+                    <p className="text-lg font-semibold text-white/80">
+                      tracks
+                    </p>
+                  </div>
+                </div>
+
+                {/* CONTENT */}
+
+                <div className="p-5">
+                  <h2 className="text-3xl font-black">
+                    {playlist.name}
+                  </h2>
+
+                  <p className="mt-2 text-white/55">
+                    {playlist.description ||
+                      "Your personal music collection."}
+                  </p>
+
+                  <div className="mt-5 flex items-center justify-between">
+                    <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-300">
+                      Open Playlist
+                    </span>
+
+                    <span className="text-2xl">
+                      →
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </Link>
+          ))}
+        </div>
       </div>
     </PageTransition>
   );
