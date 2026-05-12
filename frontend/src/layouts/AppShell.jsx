@@ -27,6 +27,21 @@ export default function AppShell() {
 
   return (
     <div className="min-h-screen">
+      {/* MOBILE FIXED HEADER */}
+
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-3 lg:hidden">
+        <div className="glass flex items-center justify-between rounded-[1.5rem] px-4 py-3 backdrop-blur-2xl">
+          <Logo />
+
+          <button
+            onClick={onLogout}
+            className="rounded-full bg-white/10 px-5 py-2 text-sm font-bold hover:bg-white/20"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
       <div className="mx-auto grid max-w-7xl gap-5 px-3 py-4 lg:grid-cols-[250px_1fr] lg:px-5">
         
         {/* Desktop Sidebar */}
@@ -73,21 +88,7 @@ export default function AppShell() {
 
         {/* Main Content */}
 
-        <div className="min-w-0">
-          
-          {/* Sticky Mobile Header */}
-
-          <header className="glass sticky top-0 z-50 mb-5 flex items-center justify-between rounded-[1.5rem] px-4 py-3 backdrop-blur-2xl lg:hidden">
-            <Logo />
-
-            <button
-              onClick={onLogout}
-              className="rounded-full bg-white/10 px-5 py-2 text-sm font-bold"
-            >
-              Logout
-            </button>
-          </header>
-
+        <div className="min-w-0 pt-28 lg:pt-0">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
