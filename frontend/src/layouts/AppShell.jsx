@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 
 import Logo from "../components/Logo.jsx";
 import PlayerBar from "../components/PlayerBar.jsx";
+import MobileNav from "../components/MobileNav.jsx";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -73,7 +74,7 @@ export default function AppShell() {
 
         {/* Main Content */}
 
-        <div className="min-w-0">
+        <div className="min-w-0 pb-28">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -84,6 +85,7 @@ export default function AppShell() {
       </div>
 
       <PlayerBar />
+      <MobileNav />
     </div>
   );
 }
