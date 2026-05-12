@@ -24,11 +24,16 @@ export default function MobileNav() {
       icon: "≣",
       path: "/playlists",
     },
+    {
+      name: "Account",
+      icon: "◉",
+      path: "/profile",
+    },
   ];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#040816]/95 backdrop-blur-xl md:hidden">
-      <div className="grid grid-cols-4 py-3">
+      <div className="grid grid-cols-5 py-3">
         {navItems.map((item) => {
           const active = location.pathname === item.path;
 
@@ -37,12 +42,18 @@ export default function MobileNav() {
               key={item.name}
               to={item.path}
               className={`flex flex-col items-center justify-center gap-1 text-xs ${
-                active ? "text-cyan-400" : "text-white/45"
+                active
+                  ? "text-cyan-400"
+                  : "text-white/45"
               }`}
             >
-              <span className="text-2xl">{item.icon}</span>
+              <span className="text-2xl">
+                {item.icon}
+              </span>
 
-              <span>{item.name}</span>
+              <span>
+                {item.name}
+              </span>
             </Link>
           );
         })}
