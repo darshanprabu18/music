@@ -1,7 +1,9 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+
 import Logo from "../components/Logo.jsx";
 import PlayerBar from "../components/PlayerBar.jsx";
+
 import { useAuth } from "../context/AuthContext.jsx";
 
 const links = [
@@ -10,11 +12,12 @@ const links = [
   ["Playlists", "/playlists"],
   ["Favorites", "/favorites"],
   ["Upload", "/upload"],
-  ["Profile", "/profile"]
+  ["Profile", "/profile"],
 ];
 
 export default function AppShell() {
   const { user, logout } = useAuth();
+
   const navigate = useNavigate();
 
   const onLogout = () => {
@@ -25,8 +28,12 @@ export default function AppShell() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto grid max-w-7xl gap-5 px-3 py-4 lg:grid-cols-[250px_1fr] lg:px-5">
+        
+        {/* Desktop Sidebar */}
+
         <aside className="glass sticky top-4 z-30 hidden h-[calc(100vh-2rem)] rounded-[1.8rem] p-5 lg:block">
           <Logo />
+
           <nav className="mt-10 grid gap-2">
             {links.map(([label, to]) => (
               <NavLink
@@ -35,7 +42,9 @@ export default function AppShell() {
                 end={to === "/"}
                 className={({ isActive }) =>
                   `rounded-2xl px-4 py-3 text-sm font-bold transition ${
-                    isActive ? "bg-white text-ink shadow-glow" : "text-white/62 hover:bg-white/10 hover:text-white"
+                    isActive
+                      ? "bg-white text-ink shadow-glow"
+                      : "text-white/62 hover:bg-white/10 hover:text-white"
                   }`
                 }
               >
@@ -43,42 +52,51 @@ export default function AppShell() {
               </NavLink>
             ))}
           </nav>
+
           <div className="absolute inset-x-5 bottom-5 rounded-3xl bg-gradient-to-br from-lagoon/20 via-vapor/20 to-flare/20 p-4">
-            <p className="text-xs font-semibold text-white/50">Signed in as</p>
-            <p className="truncate text-sm font-extrabold">{user?.username}</p>
-            <button onClick={onLogout} className="mt-4 rounded-full bg-white/10 px-4 py-2 text-xs font-bold hover:bg-white/20">
+            <p className="text-xs font-semibold text-white/50">
+              Signed in as
+            </p>
+
+            <p className="truncate text-sm font-extrabold">
+              {user?.username}
+            </p>
+
+            <button
+              onClick={onLogout}
+              className="mt-4 rounded-full bg-white/10 px-4 py-2 text-xs font-bold hover:bg-white/20"
+            >
               Logout
             </button>
           </div>
         </aside>
 
+        {/* Main Content */}
+
         <div className="min-w-0">
-          <header className="glass sticky top-3 z-20 mb-5 flex items-center justify-between rounded-[1.5rem] px-4 py-3 lg:hidden">
+          
+          {/* Sticky Mobile Header */}
+
+          <header className="glass sticky top-0 z-50 mb-5 flex items-center justify-between rounded-[1.5rem] px-4 py-3 backdrop-blur-2xl lg:hidden">
             <Logo />
-            <button onClick={onLogout} className="rounded-full bg-white/10 px-4 py-2 text-xs font-bold">
+
+            <button
+              onClick={onLogout}
+              className="rounded-full bg-white/10 px-5 py-2 text-sm font-bold"
+            >
               Logout
             </button>
           </header>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             <Outlet />
           </motion.div>
         </div>
       </div>
 
-      <nav className="fixed bottom-24 left-3 right-3 z-30 grid grid-cols-6 rounded-[1.4rem] border border-white/10 bg-ink/75 p-2 backdrop-blur-2xl lg:hidden">
-        {links.map(([label, to]) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === "/"}
-            className={({ isActive }) =>
-              `rounded-2xl px-1 py-2 text-center text-[11px] font-bold ${isActive ? "bg-white text-ink" : "text-white/55"}`
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
-      </nav>
       <PlayerBar />
     </div>
   );
